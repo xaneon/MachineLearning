@@ -32,7 +32,8 @@ plt.savefig("example_digit.png")
 
 # e.g. simple 3x3 kernel:
 # example kernel for edge detection:
-kernel = np.array([[-1, -1, -1], [-1, -8, -1], [-1, -1, -1]])
+kernel = np.array([[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]])
+# kernel = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]])
 kernel_identity = np.array([[0, 0, 0], [0, 1, 0], [0, 0, 0]])
 plt.figure()
 plt.imshow(kernel)
@@ -47,10 +48,13 @@ feature_map = np.ones(example_image.shape)
 for i, row in enumerate(example_image):
     for j, elem in enumerate(row):
         accumulator = 0
-        for kernel_row in kernel:
-            for kernel_item in kernel_row:
+        for ik, kernel_row in enumerate(kernel):
+            for jk, kernel_item in enumerate(kernel_row):
+                # if i == (i - ik) and j == (j - jk):
                 accumulator += elem * kernel_item
         feature_map[i, j] = accumulator
+
+# this could be continued with multiple kernels
 
 print(feature_map)
 plt.figure()
