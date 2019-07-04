@@ -1,6 +1,7 @@
 # Created by .ignore support plugin (hsz.mobi)
 venv/
 venv2/
+*.png
 supervised/regression/*.png
 supervised/classification/*.png
 supervised/classification/summary_logs/
