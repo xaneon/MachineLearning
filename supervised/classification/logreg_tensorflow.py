@@ -10,11 +10,12 @@ from sklearn.model_selection import train_test_split
 # let us have a look at the probability function first:
 x = np.linspace(-10, 10, 100)
 probfun = np.vectorize(lambda y: np.exp(y) / (1 + np.exp(y)))
-minmaxnorm = np.vectorize(lambda y: (y - np.min(y)) / np.max(y) - np.min(y))
+# minmaxnorm = np.vectorize(lambda y: (y - np.min(y)) / np.max(y) - np.min(y))
+minmaxnorm = np.vectorize(lambda y: np.abs((y - np.min(y)) / np.max(y) - np.min(y)))
 
 plt.figure()
 plt.plot(x, minmaxnorm(probfun(x)), "b",
-         label=r"$\frac{\exp(x)}{1 + \exp(x)}$")
+         label=r"$\mid\frac{\exp(x)}{1 + \exp(x)}\mid$")
 plt.legend()
 plt.savefig("probfunction_logistic_sigmoid.png")
 
@@ -105,13 +106,138 @@ y_hat_onehot_test = pd.get_dummies(y_hat_test).values
 print(Y_test - y_hat_onehot_test)
 # prediction works perfectly
 
-
-
 # Later: maybe plot the weights in multiple dimensions and see how they converge
 
+# now let us try logistic regression in tensorflow
 
+# we will start with placeholders, specify the shape of data but not the amount of data
+# this has also the advantage of feeding "batches" of data to our algorithms without changing it
+num_features = X_train.shape[1] # 4: petal width, petal length, sepal width, sepal lengthi:w
+num_labels = Y_train.shape[1]  # 3: categories: Iris setosa, Iris virginica, Iris versicolor
+print(num_features, num_labels)
 
+# now let us define placeholders for the feature matrix and the target values
+X = tf.placeholder(tf.float32, [None, num_features])
+y = tf.placeholder(tf.float32, [None, num_labels])
+print(X, y)
 
+# now we initialise the Weight Matrix and bias vector with zeros in tf
+# W = tf.Variable(tf.zeros([num_features, num_labels]))
+W = tf.Variable(tf.zeros([num_features, num_labels]))
+b = tf.Variable(tf.zeros([num_labels]))
+
+# let us take a random sample drawn from a normal distribution with tf
+weights = tf.Variable(tf.random_normal([num_features, num_labels],
+                                       mean=0,
+                                       stddev=0.01,
+                                       name="weights"))
+bias = tf.Variable(tf.random_normal([1, num_labels],
+                                    mean=0,
+                                    stddev=0.01,
+                                    name="bias"))
+print(weights, bias)
+
+# let us now apply the logistic model: Y = sigmoid(XW + b)
+# we need the tensorflow functions matmul(), add() and sigmoid() for this
+# with placehoders (X, y) and variables (W, b):
+apply_weigths_operation = tf.matmul(X, weights, name="apply_weights")
+add_bias_operation = tf.add(apply_weigths_operation, bias, name="add_bias")
+activation_operation = tf.nn.sigmoid(add_bias_operation, name="activation")
+print(activation_operation)
+
+# training: we are now looking for the optimal weights which optimises the error/cost measure
+# loss function: squared mean error loss function
+# minimise by gradient descent: batch gradient descent
+
+# number of epochs
+numEpochs = 700  # previously called num_steps
+
+# definition of the learning rate:
+learningRate = tf.train.exponential_decay(learning_rate=0.0008,
+                                          global_step=1,
+                                          decay_steps=X_train.shape[0],
+                                          decay_rate=0.95,
+                                          staircase=True)
+
+# cost function:
+cost_operation = tf.nn.l2_loss(activation_operation-y, name="squared_error_cost")
+print(cost_operation)
+
+# defining the gradient descent
+# training_operation = tf.train.GradientDescentOptimizer(learningRate).minimize(cost_operation)
+training_operation = tf.compat.v1.train.GradientDescentOptimizer(learningRate).minimize(cost_operation)
+print(training_operation)
+
+# running the operations
+# first initialise the weights and biases:
+# tf.initialize_allvariables(): the Initialization Operation will become node in graph, etc.
+session = tf.Session()
+
+init_operation = tf.global_variables_initializer()
+
+session.run(init_operation)
+
+# get correct labels with argmax, see above
+correct_predictions_operation = tf.equal(tf.argmax(activation_operation, 1),
+                                         tf.argmax(y, 1))
+
+# with false predictions = 0 and true predictions = 1, we can calculate the accuracy with:
+# accuracy = TP + TN / (TP + TN + FP + FN)
+accuracy_operation = tf.reduce_mean(tf.cast(correct_predictions_operation, "float"))
+
+# summary for regression:
+activation_summary_operation = tf.summary.histogram("output", activation_operation)
+
+# summary of accuracy
+accuracy_summary_operation = tf.summary.scalar("accuracy", accuracy_operation)
+
+# summary for cost
+cost_summary_operation = tf.summary.scalar("cost", cost_operation)
+
+# summary operations to check how varaibales (W, b) are updating after each iteration
+weightSummary = tf.summary.histogram("weights", weights.eval(session=session))
+biasSummary = tf.summary.histogram("biases", bias.eval(session=session))
+
+# Merge all summaries
+merged = tf.summary.merge([activation_summary_operation, accuracy_summary_operation,
+                           cost_summary_operation, weightSummary, biasSummary])
+
+# summary writer:
+writer = tf.summary.FileWriter("summary_logs", session.graph)
+
+# now we can define and run the actual training loop
+cost, diff = 0, 1
+epoch_values = []
+accuracy_values = []
+cost_values = []
+
+for i in range(numEpochs):
+    if i > 1 and diff < .0001:
+        print("change in cost %g; convergence" %diff)
+        break
+    else:
+        step = session.run(training_operation, feed_dict={X: X_train, y: Y_train})
+        # report occasional stats:
+        if i % 10 == 0:
+            epoch_values.append(i)
+            train_accuracy, newCost = session.run([accuracy_operation, cost_operation],
+                                                  feed_dict={X: X_train, y: Y_train})
+            accuracy_values.append(train_accuracy)
+            cost_values.append(newCost)
+            diff = abs(newCost - cost)
+            cost = newCost
+
+            #prints:
+            print("step", i, "training accuracy", train_accuracy, "cost", newCost,
+                  "change in cost", diff)
+
+print("final accuracy on test set:", session.run(accuracy_operation,
+                                                 feed_dict={X: X_test, y: Y_test}))
+
+# let us have a look how the cost changes with iterations
+plt.figure()
+plt.plot([np.mean(cost_values[i-50:i]) for i in range(len(cost_values))])
+plt.savefig("cost_with_iterations.png")
 
 
 

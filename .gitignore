@@ -3,5 +3,6 @@ venv/
 venv2/
 supervised/regression/*.png
 supervised/classification/*.png
+supervised/classification/summary_logs/
 supervised/regression/Fuelconsumption.csv
 .idea/
