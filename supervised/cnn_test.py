@@ -33,7 +33,7 @@ plt.savefig("example_digit.png")
 # e.g. simple 3x3 kernel:
 # example kernel for edge detection:
 kernel = np.array([[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]])
-# kernel = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]])
+# kernel = np.array([[0, 0, 0], [0, 1, 0], [0, 0, 0]])
 kernel_identity = np.array([[0, 0, 0], [0, 1, 0], [0, 0, 0]])
 plt.figure()
 plt.imshow(kernel)
@@ -44,15 +44,16 @@ first_step = example_image.ravel()[:9].reshape((3, 3))
 first_value_of_feature_map = np.sum(first_step * kernel)
 
 # now let us do that with the sliding kernel:
-feature_map = np.ones(example_image.shape)
-for i, row in enumerate(example_image):
-    for j, elem in enumerate(row):
-        accumulator = 0
-        for ik, kernel_row in enumerate(kernel):
-            for jk, kernel_item in enumerate(kernel_row):
-                # if i == (i - ik) and j == (j - jk):
-                accumulator += elem * kernel_item
-        feature_map[i, j] = accumulator
+feature_map = np.zeros(example_image.shape)
+
+for x in range(example_image.shape[0] - kernel.shape[0] + 1):
+    for y in range(example_image.shape[1] - kernel.shape[0] + 1):
+        for i in range(kernel.shape[0]):
+            for j in range(kernel.shape[1]):
+                feature_map[x][y] += example_image[x + i][y + j] * kernel[i][j]
+
+# apply the filter:
+feature_map = np.convolve(example_image, kernel, "valid")
 
 # this could be continued with multiple kernels
 
