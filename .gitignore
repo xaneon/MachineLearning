@@ -1,4 +1,6 @@
 # Created by .ignore support plugin (hsz.mobi)
 venv/
 venv2/
-supervised/regression/line_example.png
+supervised/regression/*.png
+supervised/regression/Fuelconsumption.csv
+.idea/
