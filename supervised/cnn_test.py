@@ -30,10 +30,16 @@ plt.savefig("example_digit.png")
 # now let us illustrate the steps in the CNN
 # 1. convolutional layer: extracting features with filters / kernels
 
-# e.g. simple 3x3 kernel:
-# example kernel for edge detection:
+## e.g. simple 3x3 kernel:
+## example kernel for edge detection:
+# kernel = np.array([[1, 0, -1], [0, 0, 0], [-1, 0, 1]])
+# kernel = np.array([[0, 1, 0], [1, -4, 1], [0, 1, 0]])
 kernel = np.array([[-1, -1, -1], [-1, 8, -1], [-1, -1, -1]])
-# kernel = np.array([[0, 0, 0], [0, 1, 0], [0, 0, 0]])
+##  example kernels for sharpening
+# kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])
+## example kernels for box blur, gaussian blur
+# kernel = np.array([[1, 1, 1], [1, 1, 1], [1, 1, 1]]) * (1/9)
+kernel_gauss = np.array([[1, 2, 1], [2, 4, 2], [1, 2, 1]]) * (1/16)
 kernel_identity = np.array([[0, 0, 0], [0, 1, 0], [0, 0, 0]])
 plt.figure()
 plt.imshow(kernel)
@@ -52,13 +58,9 @@ for x in range(example_image.shape[0] - kernel.shape[0] + 1):
             for j in range(kernel.shape[1]):
                 feature_map[x][y] += example_image[x + i][y + j] * kernel[i][j]
 
-# apply the filter:
-# feature_map = np.convolve(example_image, kernel, "valid")
-
-# this could be continued with multiple kernels
-
 print(feature_map)
 plt.figure()
+# plt.imshow(feature_map, cmap="gray")
 plt.imshow(feature_map)
 plt.savefig("example_featuremap.png")
 
