@@ -118,3 +118,5 @@ plt.figure()
 plt.imshow(feature_map_gauss_downsampled, cmap="gray")
 plt.savefig("example_featuremap_map_gauss_relu_downsampled.png")
 
+# now, there would be following the vectorisation, the fully connected layer
+# and e.g. softmax for classification
