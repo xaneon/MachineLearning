@@ -52,15 +52,38 @@ first_value_of_feature_map = np.sum(first_step * kernel)
 # now let us do that with the sliding kernel:
 feature_map = np.zeros(example_image.shape)
 
-for x in range(example_image.shape[0] - kernel.shape[0] + 1):
-    for y in range(example_image.shape[1] - kernel.shape[0] + 1):
-        for i in range(kernel.shape[0]):
-            for j in range(kernel.shape[1]):
-                feature_map[x][y] += example_image[x + i][y + j] * kernel[i][j]
+def apply_filter(image, kernel):
+    for x in range(image.shape[0] - kernel.shape[0] + 1):
+        for y in range(image.shape[1] - kernel.shape[0] + 1):
+            for i in range(kernel.shape[0]):
+                for j in range(kernel.shape[1]):
+                    feature_map[x][y] += image[x + i][y + j] * kernel[i][j]
+    return feature_map
 
-print(feature_map)
+feature_map = apply_filter(example_image, kernel)
 plt.figure()
-# plt.imshow(feature_map, cmap="gray")
-plt.imshow(feature_map)
-plt.savefig("example_featuremap.png")
+plt.imshow(feature_map, cmap="gray")
+plt.savefig("example_featuremap_edge.png")
+
+feature_map_gauss = apply_filter(example_image, kernel_gauss)
+plt.figure()
+plt.imshow(feature_map_gauss, cmap="gray")
+plt.savefig("example_featuremap_gauss.png")
+
+# now apply the ReLU on feature_maps
+idcs_smaller_0 = np.where(feature_map < 0 )
+feature_map[idcs_smaller_0] = 0
+plt.figure()
+plt.imshow(feature_map, cmap="gray")
+plt.savefig("example_featuremap_edge_relu.png")
+
+idcs_smaller_0_gauss = np.where(feature_map_gauss < 0 )
+feature_map_gauss[idcs_smaller_0_gauss] = 0
+plt.figure()
+plt.imshow(feature_map_gauss, cmap="gray")
+plt.savefig("example_featuremap_gauss_relu.png")
+
+
+
+
 
