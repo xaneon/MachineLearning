@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import tensorflow as tf
 import seaborn as sns
 from read_mnist import readall
+from numpy.lib.stride_tricks import as_strided
 
 # we start with the input layer
 dims = (28, 28)
@@ -89,19 +90,31 @@ plt.savefig("example_featuremap_gauss_relu.png")
 # we take a window sliding step width (stripe) of 2 (non-overlapping)
 # first, get 2 x 2 matrices of the overall 28 x 28 (namely 196 * (2 x 2)
 # btw: np.sqrt(196) # is 14 => (14 x 14) matrix (downsampled)
-num_pixels = np.multiply(*feature_map.shape)
-num_new_pixels = int(num_pixels / (2*2))
-image_matrix_parts = feature_map.ravel().reshape(num_new_pixels, 2, 2)
-image_matrix_downsampled = np.zeros(num_new_pixels)
-for i, image in enumerate(image_matrix_parts):
-    image_matrix_downsampled[i] = np.max(image)
-image_matrix_downsampled = image_matrix_downsampled.reshape(int(np.sqrt(num_new_pixels)),
-                                                            int(np.sqrt(num_new_pixels)))
+def pool2d(A, kernel_size, stride, padding, pool_mode="max"):
+    A = np.pad(A, padding, mode="constant")
+    output_shape = ((A.shape[0] - kernel_size)//stride + 1,
+                    (A.shape[1] - kernel_size)//stride + 1)
+    kernel_size = (kernel_size, kernel_size)
+    A_w = as_strided(A, shape = output_shape + kernel_size,
+                     strides = (stride*A.strides[0],
+                                stride*A.strides[1]) + A.strides)
+    A_w = A_w.reshape(-1, *kernel_size)
+    if pool_mode=="max":
+        return A_w.max(axis=(1,2)).reshape(output_shape)
+    if pool_mode=="avg":
+        return A_w.mean(axis=(1,2)).reshape(output_shape)
 
-print(image_matrix_downsampled.shape)
+feature_map_downsampled = pool2d(feature_map, kernel_size=2,
+                                 stride=2, padding=0, pool_mode="max")
+print(feature_map_downsampled)
 plt.figure()
-plt.imshow(image_matrix_downsampled, cmap="gray")
-plt.savefig("example_featuremap_edge_relu_downsampled.png")
+plt.imshow(feature_map_downsampled, cmap="gray")
+plt.savefig("example_featuremap_map_relu_downsampled.png")
 
-
+# and the same for our 2nd feature map:
+feature_map_gauss_downsampled = pool2d(feature_map_gauss, kernel_size=2,
+                                       stride=2, padding=0, pool_mode="max")
+plt.figure()
+plt.imshow(feature_map_gauss_downsampled, cmap="gray")
+plt.savefig("example_featuremap_map_gauss_relu_downsampled.png")
 
