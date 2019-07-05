@@ -83,7 +83,25 @@ plt.figure()
 plt.imshow(feature_map_gauss, cmap="gray")
 plt.savefig("example_featuremap_gauss_relu.png")
 
+# now we should switch to the pooling layer
+# let up try the max pooling:
+# we take (2 x 2) windows and determine the maximum value
+# we take a window sliding step width (stripe) of 2 (non-overlapping)
+# first, get 2 x 2 matrices of the overall 28 x 28 (namely 196 * (2 x 2)
+# btw: np.sqrt(196) # is 14 => (14 x 14) matrix (downsampled)
+num_pixels = np.multiply(*feature_map.shape)
+num_new_pixels = int(num_pixels / (2*2))
+image_matrix_parts = feature_map.ravel().reshape(num_new_pixels, 2, 2)
+image_matrix_downsampled = np.zeros(num_new_pixels)
+for i, image in enumerate(image_matrix_parts):
+    image_matrix_downsampled[i] = np.max(image)
+image_matrix_downsampled = image_matrix_downsampled.reshape(int(np.sqrt(num_new_pixels)),
+                                                            int(np.sqrt(num_new_pixels)))
 
+print(image_matrix_downsampled.shape)
+plt.figure()
+plt.imshow(image_matrix_downsampled, cmap="gray")
+plt.savefig("example_featuremap_edge_relu_downsampled.png")
 
 
 
