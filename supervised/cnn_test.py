@@ -53,7 +53,7 @@ for x in range(example_image.shape[0] - kernel.shape[0] + 1):
                 feature_map[x][y] += example_image[x + i][y + j] * kernel[i][j]
 
 # apply the filter:
-feature_map = np.convolve(example_image, kernel, "valid")
+# feature_map = np.convolve(example_image, kernel, "valid")
 
 # this could be continued with multiple kernels
 

@@ -2,6 +2,7 @@
 venv/
 venv2/
 *.png
+*.gz
 supervised/regression/*.png
 supervised/classification/*.png
 supervised/classification/summary_logs/
