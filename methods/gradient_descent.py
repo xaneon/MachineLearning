@@ -55,3 +55,16 @@ ax.set_xlabel("slopes")
 ax.set_ylabel("interceptions")
 ax.set_zlabel("errors")
 plt.savefig("errors_slope_interception.png")
+
+# now we keep the slope constant
+slope = -4
+intercepts_to_test = range(-100, 100)
+# and get the residuals for a number of intersections
+rs = [sum(loss_sqe(x * slope + intercept, ys)) for intercept in intercepts_to_test]
+plt.figure()
+plt.plot(intercepts_to_test, rs, "k.")
+plt.xlabel("interceptions")
+plt.ylabel("residuals")
+plt.savefig("residuals_vs_intercepts.png")
+
+
