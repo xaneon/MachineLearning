@@ -60,11 +60,31 @@ plt.savefig("errors_slope_interception.png")
 slope = -4
 intercepts_to_test = range(-100, 100)
 # and get the residuals for a number of intersections
-rs = [sum(loss_sqe(x * slope + intercept, ys)) for intercept in intercepts_to_test]
+
+# this is the equation with we could differentiate to intercept
+def sum_of_squared_residuals(x, y, intercept, slope):
+   return sum(loss_sqe(x * slope + intercept, y))
+
+# rs = [sum(loss_sqe(x * slope + intercept, ys)) for intercept in intercepts_to_test]
+rs = [sum_of_squared_residuals(x, ys, intercept, slope) for intercept in intercepts_to_test]
 plt.figure()
 plt.plot(intercepts_to_test, rs, "k.")
 plt.xlabel("interceptions")
 plt.ylabel("residuals")
 plt.savefig("residuals_vs_intercepts.png")
+
+# now let us take the derivative of this function
+# (d / d intercept) sum_of_quared_residuals --> same as derivatives of each part separately
+# let us start with one example:
+slope = -4
+intercept = 39
+
+y = (x * -4) + 42
+y_hat = y - (intercept + (x * -4))
+
+plt.figure()
+plt.plot(x, y, "b", label="line")
+plt.plot(x, y_hat, "r", label="guess")
+plt.savefig("line_example_derivative.png")
 
 
