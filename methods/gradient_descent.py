@@ -75,3 +75,30 @@ plt.savefig("sample_line.png")
 plt.figure()
 plt.plot(costs_sgd, "k.")
 plt.savefig("cost_value_progression_sgd.png")
+
+# next, we are going to implement the batch gradient descent:
+def BGD(theta, alpha, num_iters, h, X, y):
+    cost = np.ones(num_iters)
+    theta_0 = np.ones(num_iters)
+    theta_1 = np.ones(num_iters)
+    for i in range(0, num_iters):
+        theta[0] = theta[0] - (alpha/X.shape[0]) * np.sum(h - y)
+        theta[1] = theta[1] - (alpha/X.shape[0]) * np.sum((h - y) * X)
+        h = hypothesis(theta, X)
+        cost[i] = (1/X.shape[0]) * 0.5 * np.sum(np.square(h - y))
+        theta_0[i] = theta[0]
+        theta_1[i] = theta[1]
+    return theta, theta_0, theta_1, cost
+
+# now we use batch gradient descent for the regression:
+def linear_regression(X, y, alpha, num_iters):
+    theta = np.zeros(2)  # initialise the parameters
+    h = hypothesis(theta, X)
+    theta, theta_0, theta_1, cost = BGD(theta, alpha, num_iters, h, X, y)
+    return theta, theta_0, theta_1, cost
+
+theta_bgd, theta_0_bgd, theta_1_bgd, cost_bgd = linear_regression(x, y_sample,
+                                                                  alpha=0.0001,
+                                                                  num_iters=300)
+print(theta_bgd)
+# TODO: Correct BGD, SGD (is working fine), add polynomial regression, add ADAM
