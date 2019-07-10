@@ -3,132 +3,67 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 from collections import defaultdict
 
-# in linear regression we optimise the slope and the interception
+# example data:
+num = 1000
+x = np.arange(1000)
+theta = np.array([4, 3])  # intersection, slope
+y1 = theta[0] + theta[1] * x
+y2 = np.dot(theta, np.array([1, x]))
 
-def line(x, interception, slope):
-    return interception + (slope * x)
+print(y1.shape, y2.shape)
+print(y1[:10], y2[:10])
 
-x = np.arange(1_000)
-y1 = line(x, interception=2, slope=1)
-y2 = line(x, interception=2, slope=2)
-y3 = line(x, interception=2, slope=3)
+# let us create sample data
+y_sample = y2 + np.random.randn(len(y2)) * 1000
 
 plt.figure()
-plt.plot(x, y1, "b-", label=r"$1x + 2$")
-plt.plot(x, y2, "g-", label=r"$2x + 2$")
-plt.plot(x, y3, "r-", label=r"$3x + 2$")
-plt.legend()
-plt.savefig("line_test.png")
+plt.plot(x, y_sample, "k.", label="sample data")
+plt.plot(x, y2, "b", label="original")
 
-# we start with a simple dataset:
-ys = line(x, interception=42, slope=-4) + np.random.randn(len(x)) * 420
-plt.figure()
-plt.plot(x, ys, "k.", label="data")
-plt.legend()
-plt.savefig("example_data.png")
-
-# now we want to find a line which best describes this data
-# first we only determine the estimate for the slope by minimizing the
-# squared error loss function:
-def loss_sqe(y, y_pred):
-    return (y - y_pred) ** 2
-
-def min_linear(x, data, slopes, intercepts):
-    errors = list()
-    for i, slope in enumerate(slopes):
-        for j, intercept in enumerate(intercepts):
-            line = slope * x + intercept
-            err = min(loss_sqe(data, line))
-            errors.append((err, slope, intercept))
-    return  errors
-
-errors = min_linear(x, ys, range(10), range(10))
-# print(errors)
-slopes = np.array([elem[1] for elem in errors])
-intercepts = np.array([elem[2] for elem in errors])
-errs = np.array([elem[0] for elem in errors])
-
-fig = plt.figure(figsize=(10, 10))
-ax = fig.add_subplot(111, projection="3d")
-ax.scatter(slopes, intercepts, errs, c=errs, marker="o")
-ax.set_xlabel("slopes")
-ax.set_ylabel("interceptions")
-ax.set_zlabel("errors")
-plt.savefig("errors_slope_interception.png")
-
-# now we keep the slope constant
-slope = -4
-intercepts_to_test = range(-100, 100)
-# and get the residuals for a number of intersections
-
-# this is the equation with we could differentiate to intercept
-def sum_of_squared_residuals(x, y, intercept, slope):
-   return sum(loss_sqe(x * slope + intercept, y))
-
-# rs = [sum(loss_sqe(x * slope + intercept, ys)) for intercept in intercepts_to_test]
-rs = [sum_of_squared_residuals(x, ys, intercept, slope) for intercept in intercepts_to_test]
-plt.figure()
-plt.plot(intercepts_to_test, rs, "k.")
-plt.xlabel("interceptions")
-plt.ylabel("residuals")
-plt.savefig("residuals_vs_intercepts.png")
-
-# now we can try to calculate the derivative with theta:
-theta = [42, -4] # interception, slope
-line = theta[0] + theta[1] * x
-bias = 1
-X = np.array([[val, bias] for val in x])
-
-J = theta[0] + np.dot(theta[1], X)
-plt.figure()
-plt.plot(X[:, 0], ys, "k.", label="data")
-plt.plot(X[:, 0], J[:, 0], "b", label="original")
-
-# but we do not know the optimal theta values
-print(X.T.dot(X))
-print(X.T.dot(X).dot(X.T))
-print(X.T.dot(X).dot(X.T).dot(ys))
-theta_best = np.linalg.inv(X.T.dot(X)).dot(X.T).dot(ys)
-
-plt.plot(X[:, 0], theta_best[0] + theta[1] * X[:, 0],
-         "g", label="analytical")
-plt.legend()
-plt.savefig("example_j.png")
-print(theta_best)
-
-# now we define the cost function for any parameter theta:
-def cal_cost(theta, X, y):
+# let up define the cost function
+def cal_cost(theta, x, y):
     m = len(y)
-    predictions = X.dot(theta)
-    cost = (1/2 * m) * np.sum(np.square(predictions - y))
-    return cost
+    y_hat = np.dot(theta, np.array([1, x]))
+    J_of_theta = (1/2*m) * np.sum(np.square(y_hat-y))
+    return J_of_theta
 
-print(cal_cost([42, -4], X, ys))
-print(cal_cost([22, -4], X, ys))
-print(cal_cost([12, -4], X, ys))
+J = cal_cost(theta, x, y_sample)
+print(J)
 
-# now we implement actually the gradient descent:
-def gradient_descent(X, y, theta, learning_rate=0.01, iterations=20):
-    m = len(y)
-    cost_history = np.zeros(iterations)
-    theta_history = np.zeros((iterations, 2))
-    for it in range(iterations):
-        prediction = np.dot(X, theta)
-        # this is the actual gradient:
-        theta = theta - (1/m) * learning_rate * (X.T.dot((prediction - y)))
-        print("theta", theta)
-        theta_history[it, :] = theta.T
-        cost_history[it] = cal_cost(theta, X, y)
-    return theta, cost_history, theta_history
+# hypothesis
+def hypothesis(theta, X):
+    h = np.ones((X.shape[0], 1))
+    for i in range(0, X.shape[0]):
+        x = np.concatenate((np.ones(1), np.array([X[i]])), axis=0)
+        h[i] = float(np.matmul(theta, x))
+        return h
 
-theta, cost_history, theta_history = gradient_descent(X, ys, np.array([0, 0]))
+htest = hypothesis(theta, x)
+print(htest.shape)
 
-print(theta)
-plt.figure()
-plt.plot(cost_history, "k.")
-plt.savefig("costhistory.png")
+# now we can implement the stochastic gradient descent:
+def SGD(theta, alpha, num_iters, h, X, y):
+    for i in range(0, num_iters):
+        theta[0] = theta[0] - (alpha) * (h - y)
+        theta[1] = theta[1] - (alpha) * ((h - y) * X)
+        h = theta[1] * X + theta[0]
+    return theta
 
+# now we apply this to linear regression:
+def sgd_linear_regression(X, y, alpha, num_iters):
+    theta = np.zeros(2)  # initialise with zeros
+    h = hypothesis(theta, X)  # hypothesis
+    for i in range(0, X.shape[0]):
+        theta = SGD(theta, alpha, num_iters, h[i], X[i],y[i])
+        # print(theta)
+    theta = theta.reshape(1, 2)
+    return theta
 
+# make sure that alpha is small enough
+theta_sgd = sgd_linear_regression(x, y_sample, alpha=0.000001, num_iters=100)
+print(theta_sgd)
 
-
+plt.plot(x, theta_sgd[0][0] + theta_sgd[0][1] * x, "r--", label="SGD")
+plt.legend()
+plt.savefig("sample_line.png")
 
