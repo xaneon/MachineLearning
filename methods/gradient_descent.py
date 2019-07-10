@@ -73,18 +73,62 @@ plt.xlabel("interceptions")
 plt.ylabel("residuals")
 plt.savefig("residuals_vs_intercepts.png")
 
-# now let us take the derivative of this function
-# (d / d intercept) sum_of_quared_residuals --> same as derivatives of each part separately
-# let us start with one example:
-slope = -4
-intercept = 39
+# now we can try to calculate the derivative with theta:
+theta = [42, -4] # interception, slope
+line = theta[0] + theta[1] * x
+bias = 1
+X = np.array([[val, bias] for val in x])
 
-y = (x * -4) + 42
-y_hat = y - (intercept + (x * -4))
-
+J = theta[0] + np.dot(theta[1], X)
 plt.figure()
-plt.plot(x, y, "b", label="line")
-plt.plot(x, y_hat, "r", label="guess")
-plt.savefig("line_example_derivative.png")
+plt.plot(X[:, 0], ys, "k.", label="data")
+plt.plot(X[:, 0], J[:, 0], "b", label="original")
+
+# but we do not know the optimal theta values
+print(X.T.dot(X))
+print(X.T.dot(X).dot(X.T))
+print(X.T.dot(X).dot(X.T).dot(ys))
+theta_best = np.linalg.inv(X.T.dot(X)).dot(X.T).dot(ys)
+
+plt.plot(X[:, 0], theta_best[0] + theta[1] * X[:, 0],
+         "g", label="analytical")
+plt.legend()
+plt.savefig("example_j.png")
+print(theta_best)
+
+# now we define the cost function for any parameter theta:
+def cal_cost(theta, X, y):
+    m = len(y)
+    predictions = X.dot(theta)
+    cost = (1/2 * m) * np.sum(np.square(predictions - y))
+    return cost
+
+print(cal_cost([42, -4], X, ys))
+print(cal_cost([22, -4], X, ys))
+print(cal_cost([12, -4], X, ys))
+
+# now we implement actually the gradient descent:
+def gradient_descent(X, y, theta, learning_rate=0.01, iterations=20):
+    m = len(y)
+    cost_history = np.zeros(iterations)
+    theta_history = np.zeros((iterations, 2))
+    for it in range(iterations):
+        prediction = np.dot(X, theta)
+        # this is the actual gradient:
+        theta = theta - (1/m) * learning_rate * (X.T.dot((prediction - y)))
+        print("theta", theta)
+        theta_history[it, :] = theta.T
+        cost_history[it] = cal_cost(theta, X, y)
+    return theta, cost_history, theta_history
+
+theta, cost_history, theta_history = gradient_descent(X, ys, np.array([0, 0]))
+
+print(theta)
+plt.figure()
+plt.plot(cost_history, "k.")
+plt.savefig("costhistory.png")
+
+
+
 
 
