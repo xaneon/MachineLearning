@@ -53,17 +53,25 @@ def SGD(theta, alpha, num_iters, h, X, y):
 def sgd_linear_regression(X, y, alpha, num_iters):
     theta = np.zeros(2)  # initialise with zeros
     h = hypothesis(theta, X)  # hypothesis
+    track_costs = list()
     for i in range(0, X.shape[0]):
         theta = SGD(theta, alpha, num_iters, h[i], X[i],y[i])
+        track_costs.append(cal_cost(theta[0], X[i], h[i]))
         # print(theta)
     theta = theta.reshape(1, 2)
-    return theta
+    return theta, track_costs
 
 # make sure that alpha is small enough
-theta_sgd = sgd_linear_regression(x, y_sample, alpha=0.000001, num_iters=100)
+theta_sgd, costs_sgd = sgd_linear_regression(x, y_sample,
+                                             alpha=0.000001,  # learning rate
+                                             num_iters=100)  # number of iterations
 print(theta_sgd)
 
 plt.plot(x, theta_sgd[0][0] + theta_sgd[0][1] * x, "r--", label="SGD")
 plt.legend()
 plt.savefig("sample_line.png")
 
+# now let us have a look at the progression of the cost values
+plt.figure()
+plt.plot(costs_sgd, "k.")
+plt.savefig("cost_value_progression_sgd.png")
