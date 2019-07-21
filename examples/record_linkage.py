@@ -1,5 +1,8 @@
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import os
+
 # 3 examples (Ex1-3) of Matching
 # Ex 1: Data integration - Data from multiple sources
 
@@ -27,4 +30,24 @@ for rowa, rowb in zip(A, B):
 print(M, U)
 AxB = set(M).union(U)
 print("all pairs: ", AxB)
+
+# or we could build a cluster from that, let us have a look at the data:
+plt.figure()
+plt.grid(True)
+plt.plot(A.ravel(), B.ravel(), "bo")
+plt.axis("equal")
+plt.xlim([0, 15])
+plt.ylim([0, 15])
+plt.savefig("cluster_for_pairs.png")
+
+# let us load the example dataset
+with open("data.dir") as fid: data_dir = fid.readline()
+wageFname = "WageandHourComplianceActions.csv"
+inspectionFname = "FloridaRestaurantInspections.csv"
+
+df_wage = pd.read_csv(os.path.join(data_dir, wageFname))
+df_inspection = pd.read_csv(os.path.join(data_dir, inspectionFname))
+
+print(df_wage.head())
+print(df_inspection.head())
 
