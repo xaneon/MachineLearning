@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from jellyfish import levenshtein_distance
 import os
 import re
 
@@ -119,3 +120,53 @@ plt.hist(df_inspection_a.dba.apply(lambda x: len(x) if pd.notnull(x) else 0),
 plt.hist(df_wage_a.trade_nm.apply(lambda x: len(x) if pd.notnull(x) else 0),
          bins=50, color="blue", alpha=0.3)
 plt.savefig("test_word_length_distributions.png")
+
+# Comparing Records and Fields
+# we would like Ismatch: A x B -> {true, false}
+# we compare against attributes of rA oder rB to create comparison vector:
+# sim(rA, rB) = Sim(a1, a2, ..., an; b1, b2, ..., bn) = [s1(a1, b1), ... sn(an, bn)]
+# then create a decision model which classifies comparison as match or non-match
+
+# this requires pre-processing and transformation (e.g. lowercase, &-->and, abbreviation):
+name_prep = lambda x: x.lower().translate({None: "'.,"}) if pd.notnull(x) else ''
+df_wage_a["nname"] = df_wage_a.trade_nm.apply(name_prep)
+df_inspection_a["nname"] = df_inspection_a.dba.apply(name_prep)
+
+# convert zip codes to 5 digits
+df_inspection_a["nzip"] = df_inspection_a.location_zip_code.apply(lambda x:x[:5] if pd.notnull(x) else x)
+df_wage_a["nzip"] = df_wage_a.zip_cd.apply(lambda x: str(int(x)) if pd.notnull(x) else str(0))
+
+# split out street number into separate field
+df_inspection_a["snum"] = df_inspection_a.location_address.str.split(" ", 1).apply(lambda x:x[0])
+print(df_wage_a.columns)
+# print(df_wage_a.street_addr_1_txt.str.split(" ", 1).apply(lambda x: x[0]))
+# df_wage_a["snum"] = df_wage_a.street_addr_1_txt.str.split(" ", 1)[0]
+# .apply(lambda x:str(x[0]))
+
+print(df_inspection_a[["nname", "nzip", "snum"]])
+
+print(levenshtein_distance("pydata", "padata"))  # 1-character-change
+print(levenshtein_distance("pydata", "pandata"))  # insert character
+print(levenshtein_distance("pydata", "pandasa"))  # 1-character-change
+print(levenshtein_distance("pydata", "pandas"))  # character-deletion
+
+# define jaccard:
+def jaccard(s1, s2):
+    a = set(s1)
+    b = set(s2)
+    if len(a) == 0 and len(b) == 0:
+        return 0
+    return len(a & b) / len(a | b)
+
+print(jaccard("pydata", "pandas"))
+print(jaccard(["bag", "of", "words"], ["words", "bag"]))
+
+# now let us look at the n-grams
+def ngrams(seq, n):
+    return [seq[i:i+n] for i in range(1 + len(seq) -n)]
+
+print(ngrams("pydata", 2), ngrams("pandas", 2))
+print(ngrams("pydata", 3), ngrams("pandas", 3))
+print(jaccard(ngrams("pydata", 2), ngrams("pandas", 2)))
+print(jaccard(ngrams("pydata", 3), ngrams("pandas", 3)))
+
