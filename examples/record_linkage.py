@@ -51,3 +51,24 @@ df_inspection = pd.read_csv(os.path.join(data_dir, inspectionFname))
 print(df_wage.head())
 print(df_inspection.head())
 
+# Correlation between underpaid emplyees and hygiene violations
+
+# profiling
+# - accurate?
+# - complete ?
+# - consistent ?
+# - recent ?
+df_wage.info(verbose=True, null_counts=True)
+
+# Filter (restaurant data and hygiene data):
+fields = ["dba", "location_address", "location_city", "location_zip_code",
+          "district", "county_number"]
+df_inspection_a = df_inspection[fields].drop_duplicates()
+df_inspection_a.info()
+
+fields_wage = ["trade_nm", "legal_name", "street_addr_1_txt", "cty_nm",
+               "st_cd", "zip_cd", "naic_cd", "naics_code_description"]
+df_wage_a = df_wage[fields_wage].drop_duplicates()
+df_wage_a.info()
+
+# TODO: apply and groupby
