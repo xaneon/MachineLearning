@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from jellyfish import levenshtein_distance
+from nameparser import HumanName
 import os
 import re
 
@@ -170,3 +171,7 @@ print(ngrams("pydata", 3), ngrams("pandas", 3))
 print(jaccard(ngrams("pydata", 2), ngrams("pandas", 2)))
 print(jaccard(ngrams("pydata", 3), ngrams("pandas", 3)))
 
+# Human names tricky
+same_name = "RICHARD ALLAN BREGGER", "RICHARD A BREGGER", "BREGGER RICHARD A"
+# parse them, compare to firstname databases, dictionary of found matches
+print(HumanName("Dr. Richard Allan 'Rick' Bregger, CFP"))
