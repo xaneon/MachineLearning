@@ -5,6 +5,7 @@ from matplotlib import pyplot as plt
 num = 100
 num_friends = [randint(0, 100) for _ in range(num)]
 
+
 def bar(x, y, *args, **kwargs):
     savefile = kwargs.pop("savefile") if kwargs.get("savefile") else None
     xlabel = kwargs.pop("xlabel") if kwargs.get("xlabel") else None
@@ -18,6 +19,10 @@ def bar(x, y, *args, **kwargs):
     plt.savefig(savefile)
 
 
+def mean(x):
+    return sum(x) / len(x)
+
+
 if __name__ == "__main__":
     print(num_friends)
     friend_counts = Counter(num_friends)
@@ -29,3 +34,4 @@ if __name__ == "__main__":
     print(f"Number of datapoints: {len(num_friends)}")
     sv = sorted(num_friends)
     print(f"Kleinster: {sv[0]}, zweitkleinster: {sv[1]},  zweitgroesster: {sv[-2]}")
+    print(f"Mittelwert: {mean(num_friends)}")
