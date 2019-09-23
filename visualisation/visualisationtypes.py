@@ -19,6 +19,16 @@ x = np.linspace(0, 5, 42)
 M = np.ones((2, len(x))) * np.nan
 M[0, :] = 6 * x ** 2
 M[1, :] = 3.5 * x ** 2 + 4
+variances = [2 ** x for x in range(9)]
+bias_squared = sorted(variances, reverse=True)
+total_error = [x + y for x, y in zip(variances, bias_squared)]
+M2 = np.ones((3, len(variances))) * np.nan
+M2[0, :] = variances; M2[1, :] = bias_squared
+M2[2, :] = total_error
+colors = ["green", "red", "blue"]
+linestyles = ["-", "-.", ":"]
+markers = [".", ".", "."]
+labels = ["variance", "bias^2", "total error"]
 
 
 def myhist(data, binsize):
@@ -33,8 +43,11 @@ def plot(func, *args, **kwargs):
     savefile = kwargs.pop("savefile") if kwargs.get("savefile") else None
     xlabel = kwargs.pop("xlabel") if kwargs.get("xlabel") else None
     ylabel = kwargs.pop("ylabel") if kwargs.get("ylabel") else None
+    title = kwargs.pop("title") if kwargs.get("title") else None
     freturn = func(*args, **kwargs)
     plt.xlabel(xlabel); plt.ylabel(ylabel)
+    plt.title(title)
+    plt.legend(loc="best")
     plt.savefig(savefile)
     return fig, ax, freturn
 
@@ -42,18 +55,25 @@ def plot(func, *args, **kwargs):
 def line(x, y, *params, **kwargs):
     return plt.plot(x, y, **kwargs)
 
+
 def lines(x, Y, *args, **kwargs):
     plts = list()
     markers = kwargs.pop("markers") if kwargs.get("markers") else []
+    colors = kwargs.pop("colors") if kwargs.get("colors") else []
+    labels = kwargs.pop("labels") if kwargs.get("labels") else []
     linestyles = kwargs.pop("linestyles") if kwargs.get("linestyles") else []
     for idx, row in enumerate(Y):
         kwargs["marker"] = markers[idx] if markers else None
+        kwargs["color"] = colors[idx] if colors else None
+        kwargs["label"] = labels[idx] if labels else None
         kwargs["linestyle"] = linestyles[idx] if linestyles else None
         plts.append(plt.plot(x, row, **kwargs))
     return tuple(plts)
 
+
 def bar(x, y, *params, **kwargs):
     return plt.bar(x, y, **kwargs)
+
 
 if __name__ == "__main__":
     # Line chart
@@ -80,9 +100,14 @@ if __name__ == "__main__":
                    savefile="simple_matrix.png")
 
     p6, *x6 = plot(lines, x, M, xlabel="x", ylabel="y",
-                   markers=["o", "x"],
-                   linestyles=["", ""],
-                   savefile="test.png")
+                   markers=["o", "x"], linestyles=["", ""],
+                   colors=["red", "blue"], labels=["a", "b"],
+                   savefile="functions_matrix.png")
 
-
+    p7, *x7 = plot(lines, [i for i, _ in enumerate(variances)],
+                   M2, xlabel="model complexity", ylabel="f(x)",
+                   title="The Bias-Variance Tradeoff",
+                   markers=markers, linestyles=linestyles,
+                   colors=colors, labels=labels,
+                   savefile="bias_variance_tradeoff.png")
 
