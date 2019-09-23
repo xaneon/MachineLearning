@@ -29,6 +29,9 @@ colors = ["green", "red", "blue"]
 linestyles = ["-", "-.", ":"]
 markers = [".", ".", "."]
 labels = ["variance", "bias^2", "total error"]
+friends = [randint(60, 80) for _ in range(10)]
+minutes = [randint(120, 200) for _ in range(10)]
+ls = [chr(i) for i in range(97, 107)]
 
 
 def myhist(data, binsize):
@@ -44,10 +47,17 @@ def plot(func, *args, **kwargs):
     xlabel = kwargs.pop("xlabel") if kwargs.get("xlabel") else None
     ylabel = kwargs.pop("ylabel") if kwargs.get("ylabel") else None
     title = kwargs.pop("title") if kwargs.get("title") else None
+    labelseachpoint = kwargs.pop("labelseachpoint") if kwargs.get("labelseachpoint") else None
     freturn = func(*args, **kwargs)
     plt.xlabel(xlabel); plt.ylabel(ylabel)
     plt.title(title)
     plt.legend(loc="best")
+    if labelseachpoint:
+        for label, cx, cy in zip(labelseachpoint,
+                                 kwargs["x"], kwargs["y"]):
+            plt.annotate(label,
+                         xy=(cx, cy),
+                         xytext=(5, -5), textcoords="offset points")
     plt.savefig(savefile)
     return fig, ax, freturn
 
@@ -111,3 +121,7 @@ if __name__ == "__main__":
                    colors=colors, labels=labels,
                    savefile="bias_variance_tradeoff.png")
 
+    p8, *x8 = plot(line, x=friends, y=minutes,
+                   marker=".", linestyle="",
+                   labelseachpoint=ls,
+                   savefile="scatter_with_annotate.png")
