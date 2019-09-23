@@ -32,6 +32,8 @@ labels = ["variance", "bias^2", "total error"]
 friends = [randint(60, 80) for _ in range(10)]
 minutes = [randint(120, 200) for _ in range(10)]
 ls = [chr(i) for i in range(97, 107)]
+test1_grades = [randint(80, 100) for _ in range(10)]
+test2_grades = [randint(60, 100) for _ in range(10)]
 
 
 def myhist(data, binsize):
@@ -47,6 +49,7 @@ def plot(func, *args, **kwargs):
     xlabel = kwargs.pop("xlabel") if kwargs.get("xlabel") else None
     ylabel = kwargs.pop("ylabel") if kwargs.get("ylabel") else None
     title = kwargs.pop("title") if kwargs.get("title") else None
+    equal = kwargs.pop("equal") if kwargs.get("equal") else None
     labelseachpoint = kwargs.pop("labelseachpoint") if kwargs.get("labelseachpoint") else None
     freturn = func(*args, **kwargs)
     plt.xlabel(xlabel); plt.ylabel(ylabel)
@@ -58,6 +61,8 @@ def plot(func, *args, **kwargs):
             plt.annotate(label,
                          xy=(cx, cy),
                          xytext=(5, -5), textcoords="offset points")
+    if equal:
+        plt.axis("equal")
     plt.savefig(savefile)
     return fig, ax, freturn
 
@@ -124,4 +129,10 @@ if __name__ == "__main__":
     p8, *x8 = plot(line, x=friends, y=minutes,
                    marker=".", linestyle="",
                    labelseachpoint=ls,
+                   title="Taegliche Minuten vs. Anzahl Freunde",
+                   xlabel="# Freunde", ylabel="Minuten",
                    savefile="scatter_with_annotate.png")
+
+    p9, *x9 = plot(line, x=test1_grades, y=test2_grades,
+                   marker=".", linestyle="",
+                   savefile="axis_equal.png", equal=True)
