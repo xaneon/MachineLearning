@@ -26,3 +26,6 @@ if __name__ == "__main__":
     bar(xs, ys, color="blue", savefile="histogram_friendcounts.png",
         xlabel="# of friends", ylabel="# of people",
         title="Histogram of Friend Counts")
+    print(f"Number of datapoints: {len(num_friends)}")
+    sv = sorted(num_friends)
+    print(f"Kleinster: {sv[0]}, zweitkleinster: {sv[1]},  zweitgroesster: {sv[-2]}")
