@@ -16,8 +16,8 @@ grades = [randint(0, 100) for _ in range(num)]
 
 def myhist(data, binsize):
     tobins = lambda elem: elem // binsize * binsize
-    values_counts = Counter(tobins(dt) for dt in data)
-    return values_counts
+    counter_obj = Counter(tobins(dt) for dt in data)
+    return counter_obj
 
 def plot(func, *args, **kwargs):
     plt.figure()
@@ -28,7 +28,7 @@ def plot(func, *args, **kwargs):
     freturn = func(*args, **kwargs)
     plt.xlabel(xlabel); plt.ylabel(ylabel)
     plt.savefig(savefile)
-    return fig, ax
+    return fig, ax, freturn
 
 
 def line(x, y, *params, **kwargs):
@@ -39,14 +39,19 @@ def bar(x, y, *params, **kwargs):
 
 if __name__ == "__main__":
     # Line chart
-    p1, ax1 = plot(line, x=sorted(years), y=sorted(gdp),
+    p1, *x1 = plot(line, x=sorted(years), y=sorted(gdp),
                    color="green", marker="o", linestyle="solid",
                    savefile="lineplot.png", xlabel="Years",
                    ylabel="GDP")
 
-    p2, ax2 = plot(bar, x=xs, y=num_oscars, color="blue",
+    p2, *x2 = plot(bar, x=xs, y=num_oscars, color="blue",
                    savefile="barplot.png", xlabel="Movies",
                    ylabel="# Oscars")
 
-    print(myhist(grades, 100))
+    hist = myhist(grades, 10)
+    p3, *x3 = plot(bar, x=hist.keys(), y=hist.values(),
+                   color="green", savefile="histplot.png",
+                   xlabel="bins",
+                   ylabel="# of points per bin",
+                   width=4)
 
