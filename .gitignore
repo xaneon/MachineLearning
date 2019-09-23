@@ -4,6 +4,7 @@ venv2/
 *.png
 *.jpg
 *.gz
+*.dir
 supervised/regression/*.png
 supervised/classification/*.png
 supervised/classification/summary_logs/
