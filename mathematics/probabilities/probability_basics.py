@@ -13,3 +13,4 @@ if __name__ == "__main__":
     print(f"Wahrscheintlichkeit für 2: {P_2}")
     print(f"Wahrscheintlichkeit für 1+2: {P_12}")
     print(f"Würfeln ergab: {roll_dice()}")
+    # TODO
