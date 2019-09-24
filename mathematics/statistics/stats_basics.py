@@ -23,6 +23,19 @@ def mean(x):
     return sum(x) / len(x)
 
 
+def median(x):
+    n = len(x)
+    sorted_x = sorted(x)
+    midpoint = n // 2
+    if n % 2 == 1:
+        return sorted_x[midpoint]
+    else:
+        lo = midpoint - 1
+        hi = midpoint
+        return (sorted_x[lo] + sorted_x[hi]) / 2
+
+
+
 if __name__ == "__main__":
     print(num_friends)
     friend_counts = Counter(num_friends)
@@ -35,3 +48,4 @@ if __name__ == "__main__":
     sv = sorted(num_friends)
     print(f"Kleinster: {sv[0]}, zweitkleinster: {sv[1]},  zweitgroesster: {sv[-2]}")
     print(f"Mittelwert: {mean(num_friends)}")
+    print(f"Zentralwert: {median(num_friends)}")
