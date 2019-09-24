@@ -1,6 +1,8 @@
 from numpy.random import randint
 from collections import Counter
 from matplotlib import pyplot as plt
+from math import sqrt
+import numpy as np
 
 num = 100
 num_friends = [randint(0, 100) for _ in range(num)]
@@ -37,6 +39,8 @@ def median(x):
 
 
 def quantile(x, p):
+    n = len(x)
+    # p_index = int(p * len(x))
     p_index = int(p * len(x))
     return sorted(x)[p_index]
 
@@ -45,6 +49,30 @@ def mode(x):  # the most common values
     counts = Counter(x)
     max_count = max(counts.values())
     return [x_i for x_i, count in counts.items() if count == max_count]
+
+
+def data_range(x):  # dispersion
+    return max(x) - min(x)
+
+
+def mean_deviations(x):
+    m = mean(x)
+    return [x_i - m for x_i in x]
+
+
+def sum_of_squares(x):
+    return sum([i ** 2 for i in x])
+
+
+def variance(x):
+    n = len(x)
+    deviations = mean_deviations(x)
+    # return sum_of_squares(deviations) / (n - 1)
+    return sum_of_squares(deviations) / (n)  # the numpy way of calculating the variance
+
+
+def standard_deviation(x):
+    return sqrt(variance(x))
 
 
 if __name__ == "__main__":
@@ -57,10 +85,13 @@ if __name__ == "__main__":
         title="Histogram of Friend Counts")
     print(f"Number of datapoints: {len(num_friends)}")
     sv = sorted(num_friends)
-    print(f"Kleinster: {sv[0]}, zweitkleinster: {sv[1]},  zweitgroesster: {sv[-2]}")
-    print(f"Mittelwert: {mean(num_friends)}")
-    print(f"Zentralwert: {median(num_friends)}")
-    print(f"25 % Quantile: {quantile(num_friends, 0.25)}")
+    print(f"Kleinster: {sv[0], np.min(num_friends)}, zweitkleinster: {sv[1]},  zweitgroesster: {sv[-2]}")
+    print(f"Mittelwert: {mean(num_friends), np.mean(num_friends)}", end="\t")
+    print(f"Zentralwert: {median(num_friends), np.median(num_friends)}")
+    print(f"25 % Quantile: {quantile(num_friends, 0.25), np.quantile(num_friends, q=0.25)}", end="\t")
     print(f"75 % Quantile: {quantile(num_friends, 0.70)}")
-    print(f"50 % Quantile: {quantile(num_friends, 0.50)}")
+    print(f"50 % Quantile: {quantile(num_friends, 0.50)}", end="\t")
     print(f"Die häufigsten Werte: {mode(num_friends)}")
+    print(f"Die Streuung der Daten beträgt: {data_range(num_friends)}")
+    print(f"Die Varianz beträgt: {variance(num_friends), np.var(num_friends)}")
+    print(f"Die Standardabweichung beträgt: {standard_deviation(num_friends), np.std(num_friends)}")
