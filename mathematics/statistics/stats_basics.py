@@ -35,10 +35,16 @@ def median(x):
         hi = midpoint
         return (sorted_x[lo] + sorted_x[hi]) / 2
 
+
 def quantile(x, p):
     p_index = int(p * len(x))
     return sorted(x)[p_index]
 
+
+def mode(x):  # the most common values
+    counts = Counter(x)
+    max_count = max(counts.values())
+    return [x_i for x_i, count in counts.items() if count == max_count]
 
 
 if __name__ == "__main__":
@@ -57,3 +63,4 @@ if __name__ == "__main__":
     print(f"25 % Quantile: {quantile(num_friends, 0.25)}")
     print(f"75 % Quantile: {quantile(num_friends, 0.70)}")
     print(f"50 % Quantile: {quantile(num_friends, 0.50)}")
+    print(f"Die häufigsten Werte: {mode(num_friends)}")
