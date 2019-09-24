@@ -6,6 +6,7 @@ import numpy as np
 
 num = 100
 num_friends = [randint(0, 100) for _ in range(num)]
+daily_minutes = [randint(25, 60 * 5) for _ in range(num)]
 
 
 def bar(x, y, *args, **kwargs):
@@ -75,6 +76,17 @@ def standard_deviation(x):
     return sqrt(variance(x))
 
 
+def interquartile_range(x):
+    return quantile(x, 0.75) - quantile(x, 0.25)
+
+def dot(x, y):
+    return sum([xi * yi for xi, yi in zip(x, y)])
+
+
+def covariance(x, y):
+    return dot(mean_deviations(x), mean_deviations(y))
+
+
 if __name__ == "__main__":
     print(num_friends)
     friend_counts = Counter(num_friends)
@@ -95,3 +107,5 @@ if __name__ == "__main__":
     print(f"Die Streuung der Daten beträgt: {data_range(num_friends)}")
     print(f"Die Varianz beträgt: {variance(num_friends), np.var(num_friends)}")
     print(f"Die Standardabweichung beträgt: {standard_deviation(num_friends), np.std(num_friends)}")
+    print(f"Der IQR: {interquartile_range(num_friends)}")
+    print(f"Die Kovarianz: {covariance(num_friends, daily_minutes)}")
