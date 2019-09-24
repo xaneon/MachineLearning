@@ -29,10 +29,15 @@ def median(x):
     midpoint = n // 2
     if n % 2 == 1:
         return sorted_x[midpoint]
-    else:
+    else: # this depends on definition of the mean
+          # in this case: median not necessarily the same as 50 % percentile
         lo = midpoint - 1
         hi = midpoint
         return (sorted_x[lo] + sorted_x[hi]) / 2
+
+def quantile(x, p):
+    p_index = int(p * len(x))
+    return sorted(x)[p_index]
 
 
 
@@ -49,3 +54,6 @@ if __name__ == "__main__":
     print(f"Kleinster: {sv[0]}, zweitkleinster: {sv[1]},  zweitgroesster: {sv[-2]}")
     print(f"Mittelwert: {mean(num_friends)}")
     print(f"Zentralwert: {median(num_friends)}")
+    print(f"25 % Quantile: {quantile(num_friends, 0.25)}")
+    print(f"75 % Quantile: {quantile(num_friends, 0.70)}")
+    print(f"50 % Quantile: {quantile(num_friends, 0.50)}")
