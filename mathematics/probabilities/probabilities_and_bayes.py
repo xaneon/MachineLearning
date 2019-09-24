@@ -1,7 +1,8 @@
 from numpy.random import random, randn, choice, randint
 
 P1 = P2 = P3 = P4 = P5 = P6 = 1/6
-P_up = P_down = 1/2
+P_up = P_down = 1/2     # P(A) and P(B) are independent
+                        # => P(B | A) = P(B)
 
 def roll_dice():
     return int(random(1) * 6) + 1
