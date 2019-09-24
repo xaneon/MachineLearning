@@ -84,7 +84,17 @@ def dot(x, y):
 
 
 def covariance(x, y):
-    return dot(mean_deviations(x), mean_deviations(y))
+    return dot(mean_deviations(x), mean_deviations(y)) * (1/len(x))
+
+
+def correlation(x, y):  # actually linear correlation
+    stdx = standard_deviation(x)
+    stdy = standard_deviation(y)
+    if stdx > 0 and stdy > 0:
+        # return covariance(x, y) / (stdx * stdy)
+        return covariance(x, y) / stdx / stdy
+    else:
+        return 0
 
 
 if __name__ == "__main__":
@@ -109,3 +119,4 @@ if __name__ == "__main__":
     print(f"Die Standardabweichung beträgt: {standard_deviation(num_friends), np.std(num_friends)}")
     print(f"Der IQR: {interquartile_range(num_friends)}")
     print(f"Die Kovarianz: {covariance(num_friends, daily_minutes)}")
+    print(f"Die Korrelation beträgt: {correlation(num_friends, daily_minutes)}")
