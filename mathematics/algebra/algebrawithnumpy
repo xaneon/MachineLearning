@@ -8,6 +8,9 @@ v1 = np.array([1, 2, 3]).T
 e1 = np.array([1, 0, 0])
 e2 = np.array([0, 1, 0])
 e3 = np.array([0, 0, 1])
+I = np.array([[1, 0, 0],
+              [0, 1, 0],
+              [0, 0, 1]])
 print(A, v1, sep="\n")
 
 ## A * v1
@@ -17,4 +20,16 @@ r = np.dot(A, v1) # completely with numpy
 # 4. Solution to Ax = 0?
 # 5. Solution to Ax = b?
 
-print(r, r1, r2)
+print("multiply A * v1: ", r, r1, r2)
+
+print("A * I = I * A: ", np.dot(A, I), np.dot(I, A))
+
+# not every matrix has an inverse
+# singular matrices are invertable
+B = np.array([[1, 2, 3],
+              [1, 42, 33],
+              [1, 3, 49]])
+print("not invertable, no singular", np.linalg.det(A))
+print("invertable, singular", np.linalg.det(B))
+print("A^-1: ", np.linalg.inv(B))
+
