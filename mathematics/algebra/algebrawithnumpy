@@ -10,7 +10,7 @@ e2 = np.array([0, 1, 0])
 e3 = np.array([0, 0, 1])
 I = np.array([[1, 0, 0],
               [0, 1, 0],
-              [0, 0, 1]])
+              [0, 0, 1]]) # or np.identity(3)
 print(A, v1, sep="\n")
 
 ## A * v1
@@ -32,4 +32,16 @@ B = np.array([[1, 2, 3],
 print("not invertable, no singular", np.linalg.det(A))
 print("invertable, singular", np.linalg.det(B))
 print("A^-1: ", np.linalg.inv(B))
+
+print("A.rref(): ")
+
+print("shape: ", A.shape)
+print("dimensions: ", A.ndim)
+print("rank: ", np.linalg.matrix_rank(A))
+# independence, nullspace, free variables
+
+# permutations, span, basis
+
+# also quite useful for augmented matrices:
+print(np.hstack((I, A)))
 
