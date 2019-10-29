@@ -7,11 +7,14 @@ def describe_matrix(data: np.ndarray) -> str:
    n, m = data.shape
    r = np.linalg.matrix_rank(data)
    dtype = data.dtype
-   res = (f"# rows n: \t\t\t{n}\n" +
-          f"# cols m: \t\t\t{m}\n" +
-          f"dim N(A): \t\t\t{m - r}\n" +
-          f"dim C(A) (=rank r): \t\t{r}\n" +
-          f"Data type: \t\t\t{dtype}\n")
+
+   res = (f"| Parameter: | Value | \n" +
+          f"| -- | -- | \n" +
+          f"| num rows $n$: | {n} | \n" +
+          f"| num cols $m$: | {m} | \n" +
+          f"| dim $N(A)$: | {m - r} | \n" +
+          f"| dim $C(A)$ (=rank $r$): | {r} | \n" +
+          f"| Data type: | {dtype} | \n")
    return res
 
 
