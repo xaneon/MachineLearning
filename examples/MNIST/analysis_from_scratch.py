@@ -2,6 +2,7 @@ from load_data import loadall
 from json import load
 from os.path import join, sep
 from sys import path
+import matplotlib.pyplot as plt
 import numpy as np
 settings = load(open("foldersettings.json"))
 path.append(join(f"{sep}".join(settings["projectdir"]),
@@ -13,5 +14,13 @@ if __name__ == "__main__":
     data = loadall(datadir, prefix="*ubyte*")
     X_train, X_test = data["i60000"], data["i10000"]
     y_train, y_test = data["l60000"], data["l10000"]
-    print(describe_matrix(X_train))
+    print(describe_matrix(X_train))  # non-square matrix
+                                     # => no solution to Ax = b
+                                     # What about A^T A x_hat = A^T b ?
+    # 1. Visualise and clean data
+    plt.figure()
+    plt.imshow(X_train[0, :].reshape(28, 28), cmap="gist_yarg")
+    plt.savefig(join("img", "example_digit.png"))
+
+
 
