@@ -8,4 +8,7 @@ path.append(join(f"{sep}".join(settings["projectdir"]),
 from mystats import avg
 
 if __name__ == "__main__":
-    print(avg([1, 3, 5]))
+    datadir = f"{sep}".join(settings["datadir"])
+    data = loadall(datadir, prefix="*ubyte*")
+    X_train, X_test = data["i60000"], data["i10000"]
+    y_train, y_test = data["l60000"], data["l10000"]
