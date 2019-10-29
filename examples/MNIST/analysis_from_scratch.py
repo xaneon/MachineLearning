@@ -3,6 +3,7 @@ from json import load
 from os.path import join, sep
 from sys import path
 import matplotlib.pyplot as plt
+from IPython.display import Markdown as md
 import numpy as np
 settings = load(open("foldersettings.json"))
 path.append(join(f"{sep}".join(settings["projectdir"]),
@@ -14,9 +15,10 @@ if __name__ == "__main__":
     data = loadall(datadir, prefix="*ubyte*")
     X_train, X_test = data["i60000"], data["i10000"]
     y_train, y_test = data["l60000"], data["l10000"]
-    print(describe_matrix(X_train))  # non-square matrix
+    mdobj = md(describe_matrix(X_train))  # non-square matrix
                                      # => no solution to Ax = b
                                      # What about A^T A x_hat = A^T b ?
+    print(mdobj._repr_markdown_())
     # 1. Visualise and clean data
     plt.figure()
     plt.imshow(X_train[0, :].reshape(28, 28), cmap="gist_yarg")
