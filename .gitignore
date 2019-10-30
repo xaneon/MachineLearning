@@ -10,3 +10,4 @@ supervised/classification/*.png
 supervised/classification/summary_logs/
 supervised/regression/Fuelconsumption.csv
 .idea/
+/examples/MNIST/foldersettings.json
